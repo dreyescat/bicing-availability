@@ -20,11 +20,10 @@ if not os.path.exists(db_path):
     c.execute('create table RackStatus(id int, full_anchors int, empty_anchors int, timestamp text)')
     f = urllib.urlopen("http://www.bicing.cat/localizaciones/localizaciones.php")
     text = f.read()
-    stations = re.findall(r"<!\[CDATA\[([^\]]+)\]\]", text)
+    #<a href="javascript:ada('1')">01 - C/ GRAN VIA 760</a>
+    stations = re.findall(r'<a href="javascript:ada\(\'\d+\'\)">(\d+) - ([^<]+).*' , text)
     for station in stations:
-        prog = re.compile(r'.*?(\d+) - ([^<]+).*', re.UNICODE)
-        m = prog.match(station)
-        t = (int(m.groups()[0]), m.groups()[1].decode('iso_8859_1'))
+        t = (int(station[0]), station[1].decode('iso_8859_1'))
         c.execute('insert into Station values (?,?)', t)
     conn.commit()    
     f.close()
@@ -35,8 +34,8 @@ if not os.path.exists(db_path):
     
 conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
-while True:
-    sleep(50)
+while False:
+    sleep(5)
     timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     try:
         f = urllib.urlopen("http://www.bicing.cat/localizaciones/localizaciones.php")
