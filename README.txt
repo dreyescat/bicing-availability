@@ -1,6 +1,15 @@
+
+From http://www.bicing.cat we can get the bikes availability:
 https://www.bicing.cat/CallWebService/StationBussinesStatus_Cache.php
 
 $ curl -d "idStation=2" https://www.bicing.cat/CallWebService/StationBussinesStatus_Cache.php -k
+
+From http://www.citybik.es/ we can get the bikes availability:
+
+$ curl http://api.citybik.es/bicing.json
+
+Android app to display bike shared network status:
+https://github.com/eskerda/CityBikes
 
 82 - Rocafort
 84 - Diputació
