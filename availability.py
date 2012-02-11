@@ -12,7 +12,7 @@ DB_FILENAME = 'bicing.sqlite3'
 SCHEME = 'https'
 AUTHORITY = 'www.bicing.cat'
 STATIONS_PATH = '/localizaciones/localizaciones.php'
-RACK_STATUS_PATH = '/CallWebService/StationBussinesStatus_Cache.php'
+RACK_STATUS_PATH = '/CallWebService/StationBussinesStatus.php'
 
 STATIONS_URI = SCHEME + '://' + AUTHORITY + STATIONS_PATH
 RACK_STATUS_URI = SCHEME + '://' + AUTHORITY + RACK_STATUS_PATH
@@ -48,12 +48,11 @@ codes = [t[0] for t in cursor]
 
 while True:
     timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    print datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     for code in codes:
         try:
             f = urllib2.urlopen(RACK_STATUS_URI, 'idStation={0}'.format(code))
             data = f.read()
-            status = re.findall(r': (\d+)<br>', data)
+            status = re.findall(r'(\d+)<', data)
             if len(status) == 2:
                 t = (code, int(status[0]), int(status[1]), timestamp)
                 cursor.execute('insert into RackStatus values (?,?,?,?)', t)
@@ -63,8 +62,8 @@ while True:
             f.close()
         except IOError:
             # Ignore erroneous HTTP requests.
-            logging.warning('{0} request failed.'.format(timestamp))
-    print datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            logging.warning('{0}: {1} station request failed.'.format(
+                timestamp, code))
     sleep(60)
 cursor.close()
 connection.close()
